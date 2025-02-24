@@ -1,15 +1,12 @@
 #!/bin/bash
 #SBATCH -J CrossQ
-#SBATCH -a 0-3
 #SBATCH -n 1
-#SBATCH -c 4
-#SBATCH --mem-per-cpu=7000
-#SBATCH -t 72:00:00
-#SBATCH -p gpu
+#SBATCH -c 38
+#SBATCH -t 16:39:00
+#SBATCH -p accelerated
 #SBATCH --gres=gpu:1
-#SBATCH -C 'rtx3090'
-#SBATCH -o /home/palenicek/projects/sbx-crossq/logs/%A_%a.out.log
-#SBATCH -e /home/palenicek/projects/sbx-crossq/logs/%A_%a.err.log
+#SBATCH -o ../mprl_exp_result/slurmlog/out_%A_%a.log
+#SBATCH -e ../mprl_exp_result/slurmlog/err_%A_%a.log
 ## Make sure to create the logs directory /home/user/Documents/projects/prog/logs, BEFORE launching the jobs.
 
 # Setup Env

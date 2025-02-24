@@ -21,6 +21,7 @@ from sbx import SAC
 from sbx.sac.actor_critic_evaluation_callback import CriticBiasCallback, EvalCallback
 from sbx.sac.utils import *
 
+import fancy_gym
 import gymnasium as gym
 from shimmy.registration import DM_CONTROL_SUITE_ENVS
 

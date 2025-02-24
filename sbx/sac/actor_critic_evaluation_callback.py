@@ -315,8 +315,10 @@ class EvalCallback(EventCallback):
         """
         info = locals_["info"]
 
-        if locals_["done"]:
-            maybe_is_success = info.get("is_success")
+        # if locals_["done"]:
+        if locals_["done"]:  # metaworld's setting
+            maybe_is_success = info.get("success")  # metaworld's setting is success
+            # maybe_is_success = info.get("is_success")
             if maybe_is_success is not None:
                 self._is_success_buffer.append(maybe_is_success)
 
