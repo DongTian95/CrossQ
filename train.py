@@ -21,9 +21,11 @@ from sbx import SAC
 from sbx.sac.actor_critic_evaluation_callback import CriticBiasCallback, EvalCallback
 from sbx.sac.utils import *
 
-import fancy_gym
 import gymnasium as gym
 from shimmy.registration import DM_CONTROL_SUITE_ENVS
+
+import fancy_gym
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 
 os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
@@ -145,93 +147,116 @@ args_dict.update({
     "layer_norm": layer_norm
 })
 
-with wandb.init(
-    entity=args.wandb_entity,
-    project=args.wandb_project,
-    name=f"seed={seed}",
-    group=group,
-    tags=[],
-    sync_tensorboard=True,
-    config=args_dict,
-    settings=wandb.Settings(start_method="fork") if is_slurm_job() else None,
-    mode=args.wandb_mode
-) as wandb_run:
-    
-    # SLURM maintainance
-    if is_slurm_job():
-        print(f"SLURM_JOB_ID: {os.environ.get('SLURM_JOB_ID')}")
-        wandb_run.summary['SLURM_JOB_ID'] = os.environ.get('SLURM_JOB_ID')
+if __name__ == '__main__':
+    with wandb.init(
+        entity=args.wandb_entity,
+        project=args.wandb_project,
+        name=f"seed={seed}",
+        group=group,
+        tags=[],
+        sync_tensorboard=True,
+        config=args_dict,
+        settings=wandb.Settings(start_method="fork") if is_slurm_job() else None,
+        mode=args.wandb_mode
+    ) as wandb_run:
 
-    training_env = gym.make(args.env)
+        # SLURM maintainance
+        if is_slurm_job():
+            print(f"SLURM_JOB_ID: {os.environ.get('SLURM_JOB_ID')}")
+            wandb_run.summary['SLURM_JOB_ID'] = os.environ.get('SLURM_JOB_ID')
 
-    if args.env == 'dm_control/humanoid-stand':
-        training_env.observation_space['head_height'] = gym.spaces.Box(-np.inf, np.inf, (1,))
-    if args.env == 'dm_control/fish-swim':
-        training_env.observation_space['upright'] = gym.spaces.Box(-np.inf, np.inf, (1,))
+        def make_envs(env_id: str, num_env: int, seed: int, render: bool, **kwargs):
+            if render:
+                assert num_env == 1, "Rendering only works with num_env=1"
 
-    import optax
-    model = SAC(
-        "MultiInputPolicy" if isinstance(training_env.observation_space, gym.spaces.Dict) else "MlpPolicy",
-        training_env,
-        policy_kwargs=dict({
-            'activation_fn': activation_fn[args.critic_activation],
-            'layer_norm': layer_norm,
-            'batch_norm': bool(args.bn),
-            'batch_norm_momentum': float(args.bn_momentum),
-            'batch_norm_mode': args.bn_mode,
-            'dropout_rate': dropout_rate,
-            'n_critics': args.n_critics,
-            'net_arch': net_arch,
-            'optimizer_class': optax.adam,
-            'optimizer_kwargs': dict({
-                'b1': args.adam_b1,
-                'b2': 0.999 # default
-            })
-        }),
-        gradient_steps=args.utd,
-        policy_delay=args.policy_delay,
-        crossq_style=bool(args.crossq_style),
-        td3_mode=td3_mode,
-        use_bnstats_from_live_net=bool(args.bnstats_live_net),
-        policy_q_reduce_fn=policy_q_reduce_fn,
-        learning_starts=5000,
-        learning_rate=args.lr,
-        qf_learning_rate=args.lr,
-        tau=args.tau,
-        gamma=0.99 if not args.env == 'Swimmer-v4' else 0.9999,
-        verbose=0,
-        buffer_size=1_000_000,
-        seed=seed,
-        stats_window_size=1,  # don't smooth the episode return stats over time
-        tensorboard_log=f"logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/",
-    )
+            vec_env = SubprocVecEnv if num_env > 1 else DummyVecEnv     # Creates a simple vectorized wrapper for
+            # multiple environments, calling each environment IN SEQUENCE on the current Python process
 
-    # Create log dir where evaluation results will be saved
-    eval_log_dir = f"./eval_logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/eval/"
-    qbias_log_dir = f"./eval_logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/qbias/"
-    os.makedirs(eval_log_dir, exist_ok=True)
-    os.makedirs(qbias_log_dir, exist_ok=True)
+            def _make_env(env_id: str, seed: int, rank: int, render:bool, **kwargs):
+                """
+                get a function instance for creating an env
+                """
+                def _get_env():
+                    env = gym.make(id=env_id, render_mode="human" if render else None, **kwargs)
+                    env.reset(seed=seed + rank)
+                    return env
 
-    # Create callback that evaluates agent
-    eval_callback = EvalCallback(
-        make_vec_env(args.env, n_envs=1, seed=seed),
-        jax_random_key_for_seeds=args.seed,
-        best_model_save_path=None,
-        log_path=eval_log_dir, eval_freq=eval_freq,
-        n_eval_episodes=1, deterministic=True, render=False
-    )
+                return _get_env
 
-    # Callback that evaluates q bias according to the REDQ paper.
-    q_bias_callback = CriticBiasCallback(
-        make_vec_env(args.env, n_envs=1, seed=seed), 
-        jax_random_key_for_seeds=args.seed,
-        best_model_save_path=None,
-        log_path=qbias_log_dir, eval_freq=eval_freq,
-        n_eval_episodes=1, render=False
-    )
+            env_fns = [_make_env(env_id, seed=seed, rank=i, render=render, **kwargs) for i in range(num_env)]
 
-    callback_list = CallbackList(
-        [eval_callback, q_bias_callback, WandbCallback(verbose=0,)] if args.eval_qbias else 
-        [eval_callback, WandbCallback(verbose=0,)]
-    )
-    model.learn(total_timesteps=total_timesteps, progress_bar=True, callback=callback_list)
+            return vec_env(env_fns)
+
+        training_env = make_envs(env_id=args.env, num_env=4, seed=0, render=False)
+
+        if args.env == 'dm_control/humanoid-stand':
+            training_env.observation_space['head_height'] = gym.spaces.Box(-np.inf, np.inf, (1,))
+        if args.env == 'dm_control/fish-swim':
+            training_env.observation_space['upright'] = gym.spaces.Box(-np.inf, np.inf, (1,))
+
+        import optax
+        model = SAC(
+            "MultiInputPolicy" if isinstance(training_env.observation_space, gym.spaces.Dict) else "MlpPolicy",
+            training_env,
+            policy_kwargs=dict({
+                'activation_fn': activation_fn[args.critic_activation],
+                'layer_norm': layer_norm,
+                'batch_norm': bool(args.bn),
+                'batch_norm_momentum': float(args.bn_momentum),
+                'batch_norm_mode': args.bn_mode,
+                'dropout_rate': dropout_rate,
+                'n_critics': args.n_critics,
+                'net_arch': net_arch,
+                'optimizer_class': optax.adam,
+                'optimizer_kwargs': dict({
+                    'b1': args.adam_b1,
+                    'b2': 0.999 # default
+                })
+            }),
+            gradient_steps=args.utd,
+            policy_delay=args.policy_delay,
+            crossq_style=bool(args.crossq_style),
+            td3_mode=td3_mode,
+            use_bnstats_from_live_net=bool(args.bnstats_live_net),
+            policy_q_reduce_fn=policy_q_reduce_fn,
+            learning_starts=5000,
+            learning_rate=args.lr,
+            qf_learning_rate=args.lr,
+            tau=args.tau,
+            gamma=0.99 if not args.env == 'Swimmer-v4' else 0.9999,
+            verbose=0,
+            buffer_size=1_000_000,
+            seed=seed,
+            stats_window_size=1,  # don't smooth the episode return stats over time
+            tensorboard_log=f"logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/",
+        )
+
+        # Create log dir where evaluation results will be saved
+        eval_log_dir = f"./eval_logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/eval/"
+        qbias_log_dir = f"./eval_logs/{group + 'seed=' + str(seed) + '_time=' + str(experiment_time)}/qbias/"
+        os.makedirs(eval_log_dir, exist_ok=True)
+        os.makedirs(qbias_log_dir, exist_ok=True)
+
+        # Create callback that evaluates agent
+        eval_callback = EvalCallback(
+            make_vec_env(args.env, n_envs=1, seed=seed),
+            jax_random_key_for_seeds=args.seed,
+            best_model_save_path=None,
+            log_path=eval_log_dir, eval_freq=eval_freq,
+            n_eval_episodes=1, deterministic=True, render=False
+        )
+
+        # Callback that evaluates q bias according to the REDQ paper.
+        q_bias_callback = CriticBiasCallback(
+            make_vec_env(args.env, n_envs=1, seed=seed),
+            jax_random_key_for_seeds=args.seed,
+            best_model_save_path=None,
+            log_path=qbias_log_dir, eval_freq=eval_freq,
+            n_eval_episodes=1, render=False
+        )
+
+        callback_list = CallbackList(
+            [eval_callback, q_bias_callback, WandbCallback(verbose=0,)] if args.eval_qbias else
+            [eval_callback, WandbCallback(verbose=0,)]
+        )
+        model.learn(total_timesteps=total_timesteps, progress_bar=True, callback=callback_list)
