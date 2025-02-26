@@ -24,9 +24,9 @@ from sbx.sac.utils import *
 import gymnasium as gym
 from shimmy.registration import DM_CONTROL_SUITE_ENVS
 
-import fancy_gym
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
+import fancy_gym
 
 os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
 os.environ['WANDB_DIR'] = '/tmp'
