@@ -11,14 +11,16 @@ hydra:
     name: benchmark
     partition: cpuonly
     cpus_per_task: 152        # (your line "cpus-per-task" -> use underscores)
+    tasks_per_node: 4
+    account: "hk-project-p0022232"
     array_parallelism: 120    # (your "num_parallel_jobs" -> SLURM job-array concurrency)
-#    job_logging:
-#      root:
-#        handlers: [file]
     setup:
+      # Create wandb folder in fast, job-local storage: https://www.nhr.kit.edu/userdocs/horeka/filesystems/#tmpdir
+      # NOTE: wandb folder will be deleted after job completion, but by then it will have synced with server
       - export WANDB_DIR=$TMPDIR/wandb
       - mkdir -pv $WANDB_DIR
       - export WANDB_CONSOLE=off
+      - echo "MUJOCO_EGL_DEVICE_ID=$MUJOCO_EGL_DEVICE_ID"
       - export MUJOCO_EGL_DEVICE_ID=0
 
     # clusterduck extras (batch multiple Hydra runs inside one SLURM job)
@@ -32,4 +34,9 @@ hydra:
 
   sweeper:
     grid_params:
-      seed: 1,2,3,4,5
+      seed:
+        -0
+        -1
+        -2
+        -3
+        -4
