@@ -21,7 +21,7 @@ hydra:
       - export MUJOCO_EGL_DEVICE_ID=0
 
     parallel_runs_per_node: 4
-    total_runs_per_node: null
+    total_runs_per_node: 4
     resources_config:
       cpu:
       rendering:
