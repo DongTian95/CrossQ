@@ -15,13 +15,19 @@ hydra:
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
+      - export JAX_PLATFORM_NAME=cpu
+      - export OMP_NUM_THREADS=30
+      - export MKL_NUM_THREADS=30
+      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=30
+      - export OMP_PROC_BIND=spread
+      - export OMP_PLACES=cores
+
       - export WANDB_DIR=$TMPDIR/wandb
       - mkdir -pv $WANDB_DIR
       - export WANDB_CONSOLE=off
-      - export MUJOCO_EGL_DEVICE_ID=0
 
-    parallel_runs_per_node: 4
-    total_runs_per_node: 4
+    parallel_runs_per_node: 5
+    total_runs_per_node: 5
     resources_config:
       cpu:
       rendering:
@@ -30,4 +36,5 @@ hydra:
 
   sweeper:
     grid_params:
+      crossq.env: [Ant-v4]
       crossq.seed: [0, 1, 2, 3, 4]
