@@ -11,7 +11,7 @@ hydra:
     partition: cpuonly
     nodes: 1
     tasks_per_node: 1
-    cpus_per_task: 152
+    cpus_per_task: 38
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
@@ -30,4 +30,4 @@ hydra:
 
   sweeper:
     grid_params:
-      seed: [0, 1, 2, 3]
+      crossq.seed: [0, 1, 2, 3, 4]
