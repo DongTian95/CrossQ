@@ -1,0 +1,22 @@
+# conf/config.yaml
+defaults:
+  - _self_
+  - override hydra/sweeper: list   # enable the zipped list sweeper plugin
+
+hydra:
+  # keep cwd stable so train.py sees files/paths as usual; remove if you prefer Hydra's per-run dirs
+  job:
+    chdir: false
+  # optional: define empty params; you can fill these here or from CLI
+  sweeper:
+    grid_params: {}
+    list_params: {}
+
+crossq:
+  algo: crossq
+  env: Humanoid-v4
+  seed: 0
+  wandb:
+    mode: online        # 'online' to log to Weights & Biases, 'disabled' to disable logging
+    entity: null
+    project: crossq

@@ -1,0 +1,35 @@
+# @package _global_
+defaults:
+  - override /hydra/launcher: clusterduck_slurm
+  - override /hydra/sweeper: list
+
+hydra:
+  mode: MULTIRUN
+  launcher:
+    # SLURM basics (Horeka "cpuonly" queue has up to 152 threads per node)
+    timeout_min: 1200
+    name: benchmark
+    partition: cpuonly
+    cpus_per_task: 152        # (your line "cpus-per-task" -> use underscores)
+    array_parallelism: 120    # (your "num_parallel_jobs" -> SLURM job-array concurrency)
+    job_logging:
+      root:
+        handlers: [file]
+    setup:
+      - export WANDB_DIR=$TMPDIR/wandb
+      - mkdir -pv $WANDB_DIR
+      - export WANDB_CONSOLE=off
+      - export MUJOCO_EGL_DEVICE_ID=0
+
+    # clusterduck extras (batch multiple Hydra runs inside one SLURM job)
+    parallel_runs_per_node: 4
+    total_runs_per_node: null
+    resources_config:
+      cpu:
+      rendering:
+      stagger:
+        delay: 5
+
+  sweeper:
+    grid_params:
+      seed: 1,2,3,4,5
