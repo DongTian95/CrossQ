@@ -11,7 +11,7 @@ hydra:
     partition: cpuonly
     nodes: 1
     tasks_per_node: 1
-    cpus_per_task: 38
+    cpus_per_task: 152
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
