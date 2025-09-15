@@ -10,7 +10,7 @@ hydra:
     timeout_min: 1200
     name: benchmark
     partition: cpuonly
-    cpus_per_task: 152        # (your line "cpus-per-task" -> use underscores)
+    cpus_per_task: 38        # (your line "cpus-per-task" -> use underscores)
     tasks_per_node: 4
     account: "hk-project-p0022232"
     array_parallelism: 120    # (your "num_parallel_jobs" -> SLURM job-array concurrency)
