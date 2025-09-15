@@ -12,9 +12,9 @@ hydra:
     partition: cpuonly
     cpus_per_task: 152        # (your line "cpus-per-task" -> use underscores)
     array_parallelism: 120    # (your "num_parallel_jobs" -> SLURM job-array concurrency)
-    job_logging:
-      root:
-        handlers: [file]
+#    job_logging:
+#      root:
+#        handlers: [file]
     setup:
       - export WANDB_DIR=$TMPDIR/wandb
       - mkdir -pv $WANDB_DIR
