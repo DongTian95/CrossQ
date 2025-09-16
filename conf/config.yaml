@@ -13,7 +13,7 @@ hydra:
     list_params: {}
 
 crossq:
-  algo: crossq
+  algo: sac
   env: Humanoid-v4
   seed: 0
 #  adam_b1: 0.5
