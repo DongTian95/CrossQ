@@ -11,7 +11,7 @@ hydra:
     partition: cpuonly
     nodes: 1
     tasks_per_node: 1
-    cpus_per_task: 152
+    cpus_per_task: 30
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
@@ -28,8 +28,8 @@ hydra:
       - mkdir -pv $WANDB_DIR
       - export WANDB_CONSOLE=off
 
-    parallel_runs_per_node: 5
-    total_runs_per_node: 5
+    parallel_runs_per_node: 1
+    total_runs_per_node: 1
 #    resources_config:
 #      cpu:
 #      rendering:
