@@ -11,16 +11,16 @@ hydra:
     partition: cpuonly
     nodes: 1
     tasks_per_node: 1
-    cpus_per_task: 30
+    cpus_per_task: 38
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
       # Set environment variables for CPU-only training
       - export JAX_PLATFORM_NAME=cpu
       # set thread number
-      - export OMP_NUM_THREADS=60
-      - export MKL_NUM_THREADS=60
-      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=60
+      - export OMP_NUM_THREADS=38
+      - export MKL_NUM_THREADS=38
+      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=38
       - export OMP_PROC_BIND=spread
       - export OMP_PLACES=cores
 
