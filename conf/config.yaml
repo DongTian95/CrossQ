@@ -14,7 +14,7 @@ hydra:
 
 crossq:
   algo: sac
-  env: Humanoid-v4
+  env: HumanoidStandup-v4
   seed: 0
   wandb:
     mode: online       # 'online' to log to Weights & Biases, 'disabled' to disable logging
