@@ -15,7 +15,9 @@ hydra:
     account: "hk-project-p0022232"
     array_parallelism: 120
     setup:
+      # Set environment variables for CPU-only training
       - export JAX_PLATFORM_NAME=cpu
+      # set thread number
       - export OMP_NUM_THREADS=30
       - export MKL_NUM_THREADS=30
       - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=30
