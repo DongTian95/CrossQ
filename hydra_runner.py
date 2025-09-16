@@ -11,7 +11,6 @@ def main(cfg):
         "-algo", str(cfg.crossq.algo),
         "-env",  str(cfg.crossq.env),
         "-seed", str(cfg.crossq.seed),
-        "-adam_b1", str(cfg.crossq.adam_b1),
         "-wandb_mode", str(cfg.crossq.wandb.mode),
     ]
     if cfg.crossq.wandb.entity:

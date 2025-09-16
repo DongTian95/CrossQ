@@ -16,7 +16,6 @@ crossq:
   algo: sac
   env: Humanoid-v4
   seed: 0
-  adam_b1: 0.9
   wandb:
     mode: online       # 'online' to log to Weights & Biases, 'disabled' to disable logging
     entity: null
