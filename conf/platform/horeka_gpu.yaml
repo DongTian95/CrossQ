@@ -1,0 +1,45 @@
+# @package _global_
+defaults:
+  - override /hydra/launcher: clusterduck_slurm
+  - override /hydra/sweeper: list
+
+hydra:
+  mode: MULTIRUN
+  launcher:
+    partition: "accelerated"        # A100s; use accelerated-h100 / accelerated-200 for H100/H200
+    account:  "hk-project-p0022232"
+    timeout_min: 9
+    nodes: 1
+    tasks_per_node: 4               # 1 task == 1 run
+    cpus_per_task: 38               # Horeka: cpu-per-gpu ≈ 38 on A100 nodes
+    array_parallelism: 120
+
+    # Reserve 4 GPUs on the node (string->string is required here)
+    additional_parameters:
+      gres: "gpu:4"
+
+    # Make each run consume exactly 1 task & 1 GPU
+    srun_args:
+      - --ntasks=1
+      - --gpus-per-task=1
+      - --gpu-bind=single:1         # 1 distinct GPU per run
+      - --cpu-bind=cores
+      - --exact
+
+    setup:
+      - 'unset JAX_PLATFORM_NAME'   # ensure we’re not forcing CPU
+      - 'export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK'
+      - 'export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK'
+      - 'export WANDB_DIR=$TMPDIR/wandb'
+      - 'mkdir -pv "$WANDB_DIR"'
+      - 'export WANDB_CONSOLE=off'
+
+    parallel_runs_per_node: 4
+    total_runs_per_node: 4
+
+  sweeper:
+    grid_params:
+      crossq.algo: [crossq]
+      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4]
+#      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
+      crossq.seed: [0]
