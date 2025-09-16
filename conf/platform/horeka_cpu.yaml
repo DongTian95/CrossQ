@@ -6,7 +6,7 @@ defaults:
 hydra:
   mode: MULTIRUN
   launcher:
-    timeout_min: 49
+    timeout_min: 9
     name: benchmark
     partition: cpuonly
     nodes: 1
@@ -30,11 +30,11 @@ hydra:
 
     parallel_runs_per_node: 5
     total_runs_per_node: 5
-    resources_config:
-      cpu:
-      rendering:
-      stagger:
-        delay: 5
+#    resources_config:
+#      cpu:
+#      rendering:
+#      stagger:
+#        delay: 5
 
   sweeper:
     grid_params:
