@@ -6,7 +6,7 @@ defaults:
 hydra:
   mode: MULTIRUN
   launcher:
-    timeout_min: 1500
+    timeout_min: 1800
     name: benchmark
     partition: cpuonly
     nodes: 1
