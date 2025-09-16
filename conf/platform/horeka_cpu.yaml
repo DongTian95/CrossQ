@@ -9,25 +9,37 @@ hydra:
     timeout_min: 1800
     name: benchmark
     partition: cpuonly
-    nodes: 1
-    tasks_per_node: 1
-    cpus_per_task: 152
     account: "hk-project-p0022232"
-    array_parallelism: 120
-    setup:
-      # Set environment variables for CPU-only training
-      - export JAX_PLATFORM_NAME=cpu
-      # set thread number
-      - export OMP_NUM_THREADS=38
-      - export MKL_NUM_THREADS=38
-      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=38
-      - export OMP_PROC_BIND=spread
-      - export OMP_PLACES=cores
 
+    # ==== key changes ====
+    nodes: 1
+    tasks_per_node: 4        # one SLURM task per run
+    cpus_per_task: 38        # 4 * 38 = 152 CPUs per node
+    array_parallelism: 120
+    # Add a little binding help for visibility & correctness
+    srun_args:
+      - --cpu-bind=cores     # bind each task’s threads to its cpuset cores
+      - --exact              # avoid spreading across extra CPUs
+    setup:
+      # JAX on CPU
+      - export JAX_PLATFORM_NAME=cpu
+
+      # Match OpenMP/BLAS threads to cpus_per_task
+      - export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+      - export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
+      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=$SLURM_CPUS_PER_TASK
+      - export OMP_PLACES=cores
+      - export OMP_PROC_BIND=spread
+
+      # WANDB scratch
       - export WANDB_DIR=$TMPDIR/wandb
       - mkdir -pv $WANDB_DIR
       - export WANDB_CONSOLE=off
 
+      # Optional: print the allowed CPU mask so you can verify separation
+      - echo "Cpus_allowed_list: $(cat /proc/self/status | grep Cpus_allowed_list)"
+
+    # You’re filling the node exactly; keep both at 4
     parallel_runs_per_node: 4
     total_runs_per_node: 4
 
