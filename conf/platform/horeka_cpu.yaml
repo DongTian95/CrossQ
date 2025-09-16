@@ -18,9 +18,9 @@ hydra:
       # Set environment variables for CPU-only training
       - export JAX_PLATFORM_NAME=cpu
       # set thread number
-      - export OMP_NUM_THREADS=30
-      - export MKL_NUM_THREADS=30
-      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=30
+      - export OMP_NUM_THREADS=60
+      - export MKL_NUM_THREADS=60
+      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=60
       - export OMP_PROC_BIND=spread
       - export OMP_PLACES=cores
 
