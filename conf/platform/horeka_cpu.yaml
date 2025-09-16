@@ -10,8 +10,8 @@ hydra:
     account: "hk-project-p0022232"
     timeout_min: 59
     nodes: 1
-    tasks_per_node: 4
-    cpus_per_task: 38
+    tasks_per_node: 1
+    cpus_per_task: 152
     array_parallelism: 120
 
     setup:
@@ -35,8 +35,8 @@ hydra:
     # Leave empty or only string->string pairs, e.g. {hint: nomultithread}
     additional_parameters: {}
 
-    parallel_runs_per_node: 4
-    total_runs_per_node: 4
+    parallel_runs_per_node: 1
+    total_runs_per_node: 1
 
   sweeper:
     grid_params:
