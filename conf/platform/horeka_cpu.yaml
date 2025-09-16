@@ -30,11 +30,6 @@ hydra:
 
     parallel_runs_per_node: 1
     total_runs_per_node: 1
-#    resources_config:
-#      cpu:
-#      rendering:
-#      stagger:
-#        delay: 5
 
   sweeper:
     grid_params:
