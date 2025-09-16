@@ -1,21 +1,19 @@
 # @package _global_
 defaults:
-  - override /hydra/launcher: submitit_slurm    # use plain Submitit first
+  - override /hydra/launcher: clusterduck_slurm
   - override /hydra/sweeper: list
 
 hydra:
   mode: MULTIRUN
   launcher:
-    # --- SLURM basics ---
     partition: "cpuonly"
     account: "hk-project-p0022232"
     timeout_min: 1800
     nodes: 1
-    tasks_per_node: 4           # 1 task per run
-    cpus_per_task: 38           # 4×38 = 152 CPUs/node
+    tasks_per_node: 4
+    cpus_per_task: 38
     array_parallelism: 120
 
-    # Do NOT put dicts here. Only simple scalars/lists per Submitit schema.
     setup:
       - 'export JAX_PLATFORM_NAME=cpu'
       - 'export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK'
@@ -27,13 +25,15 @@ hydra:
       - 'mkdir -pv "$WANDB_DIR"'
       - 'export WANDB_CONSOLE=off'
 
-    # Optional: hard pinning
     srun_args:
       - --cpu-bind=cores
       - --exact
 
-    # Keep this empty unless you *only* add string→string flags (e.g. hint: nomultithread)
+    # Leave empty or only string->string pairs, e.g. {hint: nomultithread}
     additional_parameters: {}
+
+    parallel_runs_per_node: 4
+    total_runs_per_node: 4
 
   sweeper:
     grid_params:
