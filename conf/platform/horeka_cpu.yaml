@@ -1,47 +1,39 @@
 # @package _global_
 defaults:
-  - override /hydra/launcher: clusterduck_slurm
+  - override /hydra/launcher: submitit_slurm    # use plain Submitit first
   - override /hydra/sweeper: list
 
 hydra:
   mode: MULTIRUN
   launcher:
-    timeout_min: 1800
-    name: benchmark
-    partition: cpuonly
+    # --- SLURM basics ---
+    partition: "cpuonly"
     account: "hk-project-p0022232"
-
-    # ==== key changes ====
+    timeout_min: 1800
     nodes: 1
-    tasks_per_node: 4        # one SLURM task per run
-    cpus_per_task: 38        # 4 * 38 = 152 CPUs per node
+    tasks_per_node: 4           # 1 task per run
+    cpus_per_task: 38           # 4×38 = 152 CPUs/node
     array_parallelism: 120
-    # Add a little binding help for visibility & correctness
-    srun_args:
-      - --cpu-bind=cores     # bind each task’s threads to its cpuset cores
-      - --exact              # avoid spreading across extra CPUs
+
+    # Do NOT put dicts here. Only simple scalars/lists per Submitit schema.
     setup:
-      # JAX on CPU
-      - export JAX_PLATFORM_NAME=cpu
+      - 'export JAX_PLATFORM_NAME=cpu'
+      - 'export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK'
+      - 'export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK'
+      - 'export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=$SLURM_CPUS_PER_TASK'
+      - 'export OMP_PROC_BIND=spread'
+      - 'export OMP_PLACES=cores'
+      - 'export WANDB_DIR=$TMPDIR/wandb'
+      - 'mkdir -pv "$WANDB_DIR"'
+      - 'export WANDB_CONSOLE=off'
 
-      # Match OpenMP/BLAS threads to cpus_per_task
-      - export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-      - export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
-      - export XLA_FLAGS=--xla_cpu_multi_thread_eigen=true,intra_op_parallelism_threads=$SLURM_CPUS_PER_TASK
-      - export OMP_PLACES=cores
-      - export OMP_PROC_BIND=spread
+    # Optional: hard pinning
+    srun_args:
+      - --cpu-bind=cores
+      - --exact
 
-      # WANDB scratch
-      - export WANDB_DIR=$TMPDIR/wandb
-      - mkdir -pv $WANDB_DIR
-      - export WANDB_CONSOLE=off
-
-      # Optional: print the allowed CPU mask so you can verify separation
-      - echo "Cpus_allowed_list: $(cat /proc/self/status | grep Cpus_allowed_list)"
-
-    # You’re filling the node exactly; keep both at 4
-    parallel_runs_per_node: 4
-    total_runs_per_node: 4
+    # Keep this empty unless you *only* add string→string flags (e.g. hint: nomultithread)
+    additional_parameters: {}
 
   sweeper:
     grid_params:
