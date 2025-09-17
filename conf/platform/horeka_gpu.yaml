@@ -8,7 +8,7 @@ hydra:
   launcher:
     partition: "accelerated"        # A100s; use accelerated-h100 / accelerated-200 for H100/H200
     account:  "hk-project-p0022232"
-    timeout_min: 4
+    timeout_min: 599
     nodes: 1
     tasks_per_node: 4               # 1 task == 1 run
     cpus_per_task: 38               # Horeka: cpu-per-gpu ≈ 38 on A100 nodes
