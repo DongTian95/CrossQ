@@ -40,6 +40,6 @@ hydra:
   sweeper:
     grid_params:
       crossq.algo: [crossq, sac]
-#      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4]
-      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
+      crossq.env:  [Ant-v4]
+#      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
       crossq.seed: [0, 1]
