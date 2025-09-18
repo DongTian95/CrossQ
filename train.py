@@ -134,7 +134,7 @@ elif args.algo == 'crossq':
     args.bn_momentum = 0.99
     args.crossq_style = True        # with a joint forward pass
     args.tau = 1.0                  # without target networks
-    group = f'CrossQ_{args.env}_official'
+    group = f'CrossQ_{args.env}_debug'
 
 else:
     raise NotImplemented
