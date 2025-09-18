@@ -9,7 +9,7 @@ log() {
 
 # Create a new conda environment named 'crossq' with Python 3.11.
 log "Creating the conda environment 'crossq' with Python 3.11..."
-conda create -n crossq python=3.11 -y
+#conda create -n crossq python=3.11 -y
 
 # Activate the new environment.
 # Ensure that the conda base environment is initialized for this shell.
