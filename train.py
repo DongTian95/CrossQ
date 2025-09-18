@@ -122,7 +122,7 @@ elif args.algo == 'sac':
     args.adam_b1 = 0.9  # adam default
     if args.dropout:
         dropout_rate = 0.01
-    group = f'SAC_{args.env}_official'
+    group = f'SAC_{args.env}_debug'
 
 elif args.algo == 'crossq':
     args.policy_delay = 3
