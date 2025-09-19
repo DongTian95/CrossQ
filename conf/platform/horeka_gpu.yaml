@@ -8,7 +8,7 @@ hydra:
   launcher:
     partition: "accelerated"        # A100s; use accelerated-h100 / accelerated-200 for H100/H200
     account:  "hk-project-p0022232"
-    timeout_min: 5
+    timeout_min: 9
     nodes: 1
     tasks_per_node: 4               # 1 task == 1 run
     cpus_per_task: 38               # Horeka: cpu-per-gpu ≈ 38 on A100 nodes
@@ -33,6 +33,8 @@ hydra:
       - 'export WANDB_DIR=$TMPDIR/wandb'
       - 'mkdir -pv "$WANDB_DIR"'
       - 'export WANDB_CONSOLE=off'
+      - 'echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"'
+      - 'python -c "import jax; print(\"jax\", jax.__version__, \"backend:\", jax.default_backend()); print(\"devices:\", jax.devices())"'
 
     parallel_runs_per_node: 4
     total_runs_per_node: 4
@@ -40,6 +42,6 @@ hydra:
   sweeper:
     grid_params:
       crossq.algo: [crossq, sac]
-      crossq.env:  [Ant-v4]
+      crossq.env:  [Ant-v4, HalfCheetah-v4]
 #      crossq.env:  [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
-      crossq.seed: [0, 1]
+      crossq.seed: [0]
