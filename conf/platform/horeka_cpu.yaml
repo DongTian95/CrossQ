@@ -10,8 +10,8 @@ hydra:
     account: "hk-project-p0022232"
     timeout_min: 4319
     nodes: 1
-    tasks_per_node: 4
-    cpus_per_task: 38
+    tasks_per_node: 1
+    cpus_per_task: 152
     array_parallelism: 120
 
     setup:
@@ -35,12 +35,13 @@ hydra:
 #      hint: nomultithread       # prefer 1 thread / physical core
 
 
-    parallel_runs_per_node: 4
-    total_runs_per_node: 4
+    parallel_runs_per_node: 1
+    total_runs_per_node: 1
 
 
   sweeper:
     grid_params:
       crossq.algo: [sac]
-      crossq.env: [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
+#      crossq.env: [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
+      crossq.env: [Walker2d-v4]
       crossq.seed: [4]
