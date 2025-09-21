@@ -14,9 +14,9 @@ hydra:
 
 crossq:
   algo: sac
-  env: HumanoidStandup-v4
+  env: Ant-v4
   seed: 0
   wandb:
     mode: online       # 'online' to log to Weights & Biases, 'disabled' to disable logging
     entity: null
-    project: crossq
+    project: sac_gym_mujoco_iclr_final

@@ -8,10 +8,10 @@ hydra:
   launcher:
     partition: "cpuonly"
     account: "hk-project-p0022232"
-    timeout_min: 59
+    timeout_min: 4320
     nodes: 1
-    tasks_per_node: 1
-    cpus_per_task: 152
+    tasks_per_node: 2
+    cpus_per_task: 76
     array_parallelism: 120
 
     setup:
@@ -27,19 +27,19 @@ hydra:
       - 'export WANDB_CONSOLE=off'
 
     srun_args:
-      - --ntasks=1
       - --exclusive           # give each run its own task slot
       - --cpu-bind=cores
       - --exact
 
-    # Leave empty or only string->string pairs, e.g. {hint: nomultithread}
-    additional_parameters: {}
+    additional_parameters:
+      hint: nomultithread       # prefer 1 thread / physical core
 
-    parallel_runs_per_node: 1
-    total_runs_per_node: 1
+
+    parallel_runs_per_node: 2
+    total_runs_per_node: 2
 
   sweeper:
     grid_params:
-      crossq.algo: [crossq]
+      crossq.algo: [sac, td3]
       crossq.env: [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
-      crossq.seed: [0]
+      crossq.seed: [0, 1, 2, 3, 4]
