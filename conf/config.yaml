@@ -14,8 +14,8 @@ hydra:
 
 crossq:
   algo: sac
-  env: Ant-v4
-  seed: 0
+  env: Walker2d-v4
+  seed: 4
   wandb:
     mode: online       # 'online' to log to Weights & Biases, 'disabled' to disable logging
     entity: null
