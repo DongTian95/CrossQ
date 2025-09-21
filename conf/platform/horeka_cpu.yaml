@@ -31,8 +31,8 @@ hydra:
       - --cpu-bind=cores
       - --exact
 
-    additional_parameters:
-      hint: nomultithread       # prefer 1 thread / physical core
+#    additional_parameters:
+#      hint: nomultithread       # prefer 1 thread / physical core
 
 
     parallel_runs_per_node: 4
