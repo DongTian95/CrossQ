@@ -109,6 +109,7 @@ elif args.algo == 'redq':
 elif args.algo == 'td3':
     # With the right hyperparameters, this here can run all the above algorithms
     # and ablations.
+    args.crossq_style = False        # with a joint forward pass
     td3_mode = True
     layer_norm = args.ln
     args.adam_b1 = 0.9  # adam default
@@ -119,6 +120,7 @@ elif args.algo == 'td3':
 elif args.algo == 'sac':
     # With the right hyperparameters, this here can run all the above algorithms
     # and ablations.
+    args.crossq_style = False        # with a joint forward pass
     layer_norm = args.ln
     args.adam_b1 = 0.9  # adam default
     if args.dropout:
