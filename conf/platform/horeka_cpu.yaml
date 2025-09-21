@@ -43,4 +43,4 @@ hydra:
     grid_params:
       crossq.algo: [sac]
       crossq.env: [Ant-v4, HalfCheetah-v4, HumanoidStandup-v4, Hopper-v4, Walker2d-v4]
-      crossq.seed: [0, 1, 2, 3]
+      crossq.seed: [4]
