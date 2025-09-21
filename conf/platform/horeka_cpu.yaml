@@ -8,7 +8,7 @@ hydra:
   launcher:
     partition: "cpuonly"
     account: "hk-project-p0022232"
-    timeout_min: 4320
+    timeout_min: 4319
     nodes: 1
     tasks_per_node: 4
     cpus_per_task: 38
