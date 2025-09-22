@@ -19,4 +19,4 @@ crossq:
   wandb:
     mode: online       # 'online' to log to Weights & Biases, 'disabled' to disable logging
     entity: null
-    project: td3_gym_mujoco_iclr_final
+    project: sac_gym_mujoco_iclr_final
