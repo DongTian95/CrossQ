@@ -109,10 +109,10 @@ elif args.algo == 'redq':
 elif args.algo == 'td3':
     # With the right hyperparameters, this here can run all the above algorithms
     # and ablations.
-    args.crossq_style = False        # with a joint forward pass
+    # args.crossq_style = False        # with a joint forward pass
     td3_mode = True
     layer_norm = args.ln
-    args.adam_b1 = 0.9  # adam default
+    # args.adam_b1 = 0.9  # adam default
     if args.dropout:
         dropout_rate = 0.01
     group = f'TD3_{args.env}_bn({args.bn}/{args.bn_momentum}/{args.bn_mode})_ln{(args.ln)}_xq({args.crossq_style}/{args.tau})_utd({args.utd}/{args.policy_delay})_A{args.adam_b1}_Q({net_arch["qf"][0]})_l{args.lr}'
@@ -120,9 +120,9 @@ elif args.algo == 'td3':
 elif args.algo == 'sac':
     # With the right hyperparameters, this here can run all the above algorithms
     # and ablations.
-    args.crossq_style = False        # with a joint forward pass
+    # args.crossq_style = False        # with a joint forward pass
     layer_norm = args.ln
-    args.adam_b1 = 0.9  # adam default
+    # args.adam_b1 = 0.9  # adam default
     if args.dropout:
         dropout_rate = 0.01
     group = f'SAC_{args.env}_debug'
