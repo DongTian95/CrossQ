@@ -10,8 +10,8 @@ hydra:
     account: "hk-project-p0022232"
     timeout_min: 2000
     nodes: 1
-    tasks_per_node: 2
-    cpus_per_task: 76
+    tasks_per_node: 1
+    cpus_per_task: 152
     array_parallelism: 120
 
     setup:
@@ -35,8 +35,8 @@ hydra:
 #      hint: nomultithread       # prefer 1 thread / physical core
 
 
-    parallel_runs_per_node: 2
-    total_runs_per_node: 2
+    parallel_runs_per_node: 1
+    total_runs_per_node: 1
 
 
   sweeper:
