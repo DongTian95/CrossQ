@@ -120,9 +120,10 @@ elif args.algo == 'td3':
 elif args.algo == 'sac':
     # With the right hyperparameters, this here can run all the above algorithms
     # and ablations.
-    # args.crossq_style = False        # with a joint forward pass
+    args.crossq_style = False
     layer_norm = args.ln
-    # args.adam_b1 = 0.9  # adam default
+    args.adam_b1 = 0.9  # adam default
+    args.lr = 3.0e-4
     if args.dropout:
         dropout_rate = 0.01
     group = f'SAC_{args.env}_debug'
