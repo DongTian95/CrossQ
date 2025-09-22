@@ -11,7 +11,7 @@ hydra:
     timeout_min: 2000
     nodes: 1
     tasks_per_node: 2
-    cpus_per_task: 38
+    cpus_per_task: 76
     array_parallelism: 120
 
     setup:
