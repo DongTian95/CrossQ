@@ -124,8 +124,14 @@ elif args.algo == 'sac':
     layer_norm = args.ln
     args.adam_b1 = 0.9  # adam default
     args.lr = 3.0e-4
+    args.tau = 0.005
+    args.policy_delay = 1
+    args.utd = 1
+    args.eval_qbias = False
+
     if args.dropout:
         dropout_rate = 0.01
+    dropout_rate = 0.0
     group = f'SAC_{args.env}_debug'
 
 elif args.algo == 'crossq':
