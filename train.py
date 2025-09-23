@@ -112,9 +112,19 @@ elif args.algo == 'td3':
     # args.crossq_style = False        # with a joint forward pass
     td3_mode = True
     layer_norm = args.ln
-    # args.adam_b1 = 0.9  # adam default
+    args.crossq_style = False
+    layer_norm = args.ln
+    args.adam_b1 = 0.9  # adam default
+    args.lr = 3.0e-4
+    args.tau = 0.005
+    args.policy_delay = 1
+    args.utd = 1
+    args.eval_qbias = False
+
     if args.dropout:
         dropout_rate = 0.01
+    dropout_rate = 0.0
+    # args.adam_b1 = 0.9  # adam default
     group = f'TD3_{args.env}_bn({args.bn}/{args.bn_momentum}/{args.bn_mode})_ln{(args.ln)}_xq({args.crossq_style}/{args.tau})_utd({args.utd}/{args.policy_delay})_A{args.adam_b1}_Q({net_arch["qf"][0]})_l{args.lr}'
 
 elif args.algo == 'sac':
